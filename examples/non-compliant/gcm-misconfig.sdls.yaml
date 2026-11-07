@@ -1,0 +1,42 @@
+# Authenticated encryption that looks right at a glance: AES-GCM-256 on the
+# uplink. But the tag is truncated to 64 bits, the anti-replay window is far
+# wider than the mission allows, and the SA is missing its pad length.
+apiVersion: sdls.portfolio/v1
+kind: SecurityAssociationDatabase
+metadata:
+  mission: DEMOSAT-3
+  owner: mission-security@example.org
+  legacy_implementation: false
+
+virtual_channels:
+  - name: tc-commands
+    protocol: TC
+    gvcid: { tfvn: 0, scid: 90, vcid: 0 }
+    carries: telecommand
+    cop: true
+
+security_associations:
+  - spi: 1
+    description: Telecommand uplink
+    protocol: TC
+    gvcids:
+      - { tfvn: 0, scid: 90, vcid: 0 }
+    service: authenticated_encryption
+    algorithm: { cipher: AES, mode: GCM, key_bits: 256 }
+    iv_length_octets: 12
+    sequence_number: { length_octets: 4, window: 1024 }
+    mac_length_octets: 8
+    key_ref: kms://demosat-3/sdls/tc-ae-01
+  - spi: 1
+    description: Backup uplink SA, same SPI and same VC
+    protocol: TC
+    gvcids:
+      - { tfvn: 0, scid: 90, vcid: 1 }
+      - { tfvn: 0, scid: 90, vcid: 0 }
+    service: authenticated_encryption
+    algorithm: { cipher: AES, mode: GCM, key_bits: 256 }
+    iv_length_octets: 12
+    sequence_number: { length_octets: 4, window: 8 }
+    pad_length_octets: 0
+    mac_length_octets: 16
+    key_ref: kms://demosat-3/sdls/tc-ae-02

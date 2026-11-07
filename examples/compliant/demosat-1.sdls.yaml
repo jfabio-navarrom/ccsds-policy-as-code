@@ -1,0 +1,95 @@
+# SDLS managed-parameter database for a fictional LEO mission.
+# This is the artifact that a mission's ground segment and on-board
+# crypto unit would both be provisioned from (CCSDS 355.0-B-2 §4.2.1.2
+# requires both ends to initialise a common SA database).
+#
+# Every value here is fictional. No key material ever lives in this file:
+# keys are referenced by identifier only.
+
+apiVersion: sdls.portfolio/v1
+kind: SecurityAssociationDatabase
+metadata:
+  mission: DEMOSAT-1
+  owner: mission-security@example.org
+  # false = new implementation, so CCSDS 352.0-B-2 §3.2.1 (256-bit keys) applies.
+  legacy_implementation: false
+
+virtual_channels:
+  - name: tc-commands
+    protocol: TC
+    gvcid: { tfvn: 0, scid: 42, vcid: 0 }
+    carries: telecommand
+    cop: true                     # COP-1 in use on this VC
+  - name: tc-file-upload
+    protocol: TC
+    gvcid: { tfvn: 0, scid: 42, vcid: 1 }
+    carries: telecommand
+    cop: true
+  - name: tm-housekeeping
+    protocol: TM
+    gvcid: { tfvn: 0, scid: 42, vcid: 0 }
+    carries: telemetry
+    cop: false
+  - name: tm-payload
+    protocol: TM
+    gvcid: { tfvn: 0, scid: 42, vcid: 2 }
+    carries: payload
+    cop: false
+  - name: tm-idle
+    protocol: TM
+    gvcid: { tfvn: 0, scid: 42, vcid: 7 }
+    carries: idle_only            # OID frames only: must NOT have an SA
+    cop: false
+
+security_associations:
+  - spi: 1
+    description: Telecommand uplink, authenticated encryption
+    protocol: TC
+    gvcids:
+      - { tfvn: 0, scid: 42, vcid: 0 }
+    service: authenticated_encryption
+    algorithm: { cipher: AES, mode: GCM, key_bits: 256 }
+    iv_length_octets: 12
+    sequence_number: { length_octets: 4, window: 5 }
+    pad_length_octets: 0
+    mac_length_octets: 16
+    key_ref: kms://demosat-1/sdls/tc-ae-01
+
+  - spi: 2
+    description: File upload VC, authenticated encryption
+    protocol: TC
+    gvcids:
+      - { tfvn: 0, scid: 42, vcid: 1 }
+    service: authenticated_encryption
+    algorithm: { cipher: AES, mode: GCM, key_bits: 256 }
+    iv_length_octets: 12
+    sequence_number: { length_octets: 4, window: 5 }
+    pad_length_octets: 0
+    mac_length_octets: 16
+    key_ref: kms://demosat-1/sdls/tc-ae-02
+
+  - spi: 10
+    description: Housekeeping telemetry, authentication only (HMAC-SHA-256)
+    protocol: TM
+    gvcids:
+      - { tfvn: 0, scid: 42, vcid: 0 }
+    service: authentication
+    algorithm: { mac: HMAC, hash: SHA-256, key_bits: 256 }
+    iv_length_octets: 0
+    sequence_number: { length_octets: 4, window: 64 }
+    pad_length_octets: 0
+    mac_length_octets: 32          # full SHA-256 output, not truncated
+    key_ref: kms://demosat-1/sdls/tm-auth-01
+
+  - spi: 11
+    description: Payload downlink, encryption only (AES-CTR)
+    protocol: TM
+    gvcids:
+      - { tfvn: 0, scid: 42, vcid: 2 }
+    service: encryption
+    algorithm: { cipher: AES, mode: CTR, key_bits: 256 }
+    iv_length_octets: 16
+    sequence_number: { length_octets: 0, window: 0 }
+    pad_length_octets: 0
+    mac_length_octets: 0
+    key_ref: kms://demosat-1/sdls/tm-enc-01

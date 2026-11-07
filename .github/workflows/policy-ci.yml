@@ -1,0 +1,43 @@
+name: policy-ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  OPA_VERSION: 1.4.2
+  CONFTEST_VERSION: 0.59.0
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install OPA
+        uses: open-policy-agent/setup-opa@v2
+        with:
+          version: ${{ env.OPA_VERSION }}
+
+      - name: Install Conftest
+        run: |
+          curl -sSfL -o conftest.tgz \
+            "https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}/conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz"
+          tar xzf conftest.tgz conftest
+          sudo mv conftest /usr/local/bin/
+
+      - name: Lint (format + strict compile)
+        run: make lint
+
+      - name: Unit tests with 100% coverage gate
+        run: make coverage
+
+      - name: End-to-end on example SA databases
+        run: make examples
+
+      - name: Traceability matrix is current
+        run: make traceability-check

@@ -1,0 +1,10 @@
+{
+  "legacy-cubesat.sdls.yaml": {
+    "failures": ["SDLS-003", "SDLS-011", "SDLS-012", "SDLS-021", "CRYPTO-002", "CRYPTO-005", "MISSION-001", "MISSION-002"],
+    "warnings": ["CRYPTO-003"]
+  },
+  "gcm-misconfig.sdls.yaml": {
+    "failures": ["SDLS-002", "SDLS-004", "SDLS-010", "SDLS-012", "SDLS-013", "CRYPTO-004"],
+    "warnings": ["SDLS-022"]
+  }
+}
