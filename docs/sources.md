@@ -2,14 +2,14 @@
 
 | Standard | Edition used | How the clauses were checked |
 |---|---|---|
-| CCSDS 352.0-B-2, *CCSDS Cryptographic Algorithms* (Blue Book) | Issue 2 | Read from the public PDF at public.ccsds.org. All `CRYPTO-*` clause numbers come from this document. |
-| CCSDS 355.0-B-2, *Space Data Link Security Protocol* (Blue Book) | Issue 2 | Clause numbers taken from the public review draft **355.0-P-1.1** (Pink Sheets, June 2021) that became Issue 2. **To do:** re-verify each `SDLS-*` clause against the published 355.0-B-2 PDF; renumbering between draft and issue is possible. |
-| CCSDS 350.1-G, *Security Threats against Space Missions* (Green Book) | — | Informational. Cited only as rationale for `MISSION-*` rules, never as a requirement. |
-| CCSDS 355.1-B-1, *SDLS Extended Procedures* | — | Not yet implemented (roadmap: key and SA lifecycle states). |
+| CCSDS 352.0-B-2, *CCSDS Cryptographic Algorithms* (Blue Book) | Issue 2 | I read the public PDF at public.ccsds.org. All `CRYPTO-*` clause numbers come from this document. |
+| CCSDS 355.0-B-2, *Space Data Link Security Protocol* (Blue Book) | Issue 2 | Clause numbers from the public review draft **355.0-P-1.1** (Pink Sheets, June 2021) that became Issue 2. **To do:** check each `SDLS-*` clause again against the published 355.0-B-2 PDF; numbers can change between draft and issue. |
+| CCSDS 350.1-G, *Security Threats against Space Missions* (Green Book) | n/a | Informational. Only used as the reason for the `MISSION-*` rules, never as a requirement. |
+| CCSDS 355.1-B-1, *SDLS Extended Procedures* | n/a | Not yet implemented (roadmap: key and SA lifecycle states). |
 
 ## Requirement → field interpretation
 
-Where a clause needed interpretation to become a check, the choice is written here so a reviewer can challenge it.
+When a clause needed interpretation to become a check, I wrote the choice here so a reviewer can question it.
 
 | Policy | Clause text (abridged) | Interpretation |
 |---|---|---|
